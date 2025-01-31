@@ -1,0 +1,75 @@
+import { View, Text, TouchableOpacity, FlatList, ListRenderItem } from 'react-native';
+import React, { useState } from 'react';
+import { python, javaProgramming, cppProgramming, javascriptProgramming } from '@/constants/index'; // Import all necessary data
+import Modal from 'react-native-modal';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+
+interface Topic {
+    key: number;
+    topic: string;
+    sample_code: string;
+    description: {
+      points: string[];
+    };
+  }
+
+
+  
+const RenderingData: React.FC = () => {
+    const [isModalVisible, setModalVisible] = useState<boolean>(false);
+    const [selectedSampleCode, setSelectedSampleCode] = useState<string>('');
+  
+
+  
+    const toggleModal = (sampleCode: string) => {
+      setSelectedSampleCode(sampleCode);
+      setModalVisible(!isModalVisible);
+    };
+  
+    const renderItem: ListRenderItem<Topic> = ({ item }) => (
+      <View className='mb-4 p-4 bg-white rounded shadow'>
+        <Text className='text-lg font-bold'>{item.topic}</Text>
+        <TouchableOpacity onPress={() => toggleModal(item.sample_code)}>
+          <Text className='text-blue-500 mt-2'>Show Sample Code</Text>
+        </TouchableOpacity>
+        <View className='mt-3'>
+          {item.description.points.map((point, index) => (
+            <Text key={index} className='text-base'>
+              ▶ {point}
+            </Text>
+          ))}
+        </View>
+      </View>
+    );
+  
+    return (
+      <LinearGradient
+        className="pt-10 h-full flex items-center justify-center"
+        end={{ x: 1, y: 1 }}
+        colors={["#b6b5d4", "#736ed5", "#2118d7"]}
+        start={{ x: 0, y: 0 }}
+      >
+        <View className='flex-1 p-5'>
+          <FlatList
+            data={python} // Use the filtered data here
+            renderItem={renderItem}
+            keyExtractor={(item) => item.key.toString()}
+          />
+  
+          {/* Modal for showing sample code */}
+          <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
+            <View className='bg-white p-5 rounded'>
+              <Text className='text-lg font-bold mb-4'>Sample Code</Text>
+              <Text>{selectedSampleCode}</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)} className='mt-4'>
+                <Text className='text-blue-500'>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+        </View>
+      </LinearGradient>
+    );
+  };
+  
+  export default RenderingData;
